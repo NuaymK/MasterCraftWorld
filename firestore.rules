@@ -1,0 +1,71 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user is accessing their own data
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Check if user is a service provider
+    // Not using this function currently, but keeping for future use
+    // function isServiceProvider(userId) {
+    //   return exists(/databases/$(database)/documents/serviceProviders/$(userId));
+    // }
+    
+    // Check if user is an admin
+    function isAdmin() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == "admin";
+    }
+    
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update, delete: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    }
+    
+    // Service Providers collection
+    match /serviceProviders/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(userId);
+      allow update: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow delete: if isAdmin();
+    }
+    
+    // Service Requests collection
+    match /serviceRequests/{requestId} {
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.customerId || 
+        request.auth.uid == resource.data.assignedProvider || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.customerId || 
+        request.auth.uid == resource.data.assignedProvider || 
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+    
+    // Reviews collection
+    match /reviews/{reviewId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == request.resource.data.customerId;
+      allow update, delete: if isAdmin();
+    }
+    
+    // Notifications collection
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && request.auth.uid == resource.data.userId;
+      allow delete: if isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+  }
+}

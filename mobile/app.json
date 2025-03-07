@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobile",
-    "slug": "mobile",
+    "name": "MasterCraftWorld",
+    "slug": "mastercraftworld",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,16 +13,27 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mastercraftworld.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.mastercraftworld.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "firebaseApiKey": "AIzaSyAyCjsZfu11qZDsU3WNz2N7WyNTU2GGZe4",
+      "firebaseAuthDomain": "mastercraftworld-c0482.firebaseapp.com",
+      "firebaseProjectId": "mastercraftworld-c0482",
+      "firebaseStorageBucket": "mastercraftworld-c0482.firebasestorage.app",
+      "firebaseMessagingSenderId": "340420842995",
+      "firebaseAppId": "1:340420842995:web:ae728b989d01b196f26e86",
+      "firebaseMeasurementId": "G-P9FXPMQLBT"
     }
   }
 }

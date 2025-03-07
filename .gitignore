@@ -35,3 +35,11 @@ yarn-error.log*
 
 # Mobile
 .expo/
+
+# Firebase
+**/serviceAccountKey.json
+.firebase/
+firebase-debug.log
+ui-debug.log
+.runtimeconfig.json
+google-services.json

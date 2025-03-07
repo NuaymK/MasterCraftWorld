@@ -1,0 +1,41 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user is accessing their own data
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Check if user is an admin
+    function isAdmin() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.userType == "admin";
+    }
+    
+    // Profile photos
+    match /profile-photos/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    }
+    
+    // Certifications
+    match /certifications/{userId}/{allPaths=**} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin());
+      allow write: if isAuthenticated() && (isOwner(userId) || isAdmin());
+    }
+    
+    // Job photos
+    match /job-photos/{requestId}/{allPaths=**} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && (
+        firestore.get(/databases/(default)/documents/serviceRequests/$(requestId)).data.customerId == request.auth.uid || 
+        firestore.get(/databases/(default)/documents/serviceRequests/$(requestId)).data.assignedProvider == request.auth.uid || 
+        isAdmin()
+      );
+    }
+  }
+}
